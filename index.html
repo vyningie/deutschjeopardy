@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deutsch-Jeopardy 🐰</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;600&display=swap">
+<style>
+:root{
+  --pink:#ff8fc7;--pink-d:#e9529a;--pink-l:#ffd6ec;--blue:#bfe3ff;--blue-d:#4aa8e8;
+  --yellow:#fff3a8;--green:#c8f0a8;--lilac:#d9c8ff;
+  --bg:#d6edff;--card:#fffafd;--ink:#4a3150;--ink-soft:#7a6480;
+  --ok:#5cc98b;--no:#ff7a8f;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#2b2547;--card:#3b3360;--ink:#fff0fa;--ink-soft:#d9c8ee;--pink-l:#5a3a78;--yellow:#6b5f2a;--green:#35603f;--blue:#2f4d7a;--lilac:#4b3f7a;}}
+:root[data-theme="dark"]{--bg:#2b2547;--card:#3b3360;--ink:#fff0fa;--ink-soft:#d9c8ee;--pink-l:#5a3a78;--yellow:#6b5f2a;--green:#35603f;--blue:#2f4d7a;--lilac:#4b3f7a;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Fredoka","Baloo 2","Trebuchet MS",sans-serif;color:var(--ink);background-color:var(--bg);
+  background-image:radial-gradient(circle at 20px 20px,rgba(255,255,255,.55) 3px,transparent 4px);background-size:44px 44px;
+  min-height:100vh;overflow-x:hidden}
+h1,h2,h3,.big{font-family:"Baloo 2","Fredoka","Trebuchet MS",sans-serif;margin:0}
+.top{background:var(--pink);height:34px;position:relative;margin-bottom:22px}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-16px;height:18px;
+  background:radial-gradient(circle at 14px 0,var(--card) 13px,transparent 14px) 0 0/28px 18px repeat-x}
+.screen{display:none;max-width:860px;margin:0 auto;padding:12px 14px 40px;text-align:center}
+.screen.on{display:block}
+.card{background:var(--card);border:4px solid var(--pink);border-radius:28px;padding:22px 18px;box-shadow:0 8px 0 var(--pink-d)}
+.logo{font-size:clamp(2rem,8vw,3.4rem);font-weight:800;line-height:1.05;color:var(--pink-d)}
+.logo span:nth-child(2){color:var(--blue-d)}.logo span:nth-child(3){color:#f0b800}
+.bunny{font-size:4.2rem;display:inline-block;animation:hop 1.6s ease-in-out infinite}
+@keyframes hop{50%{transform:translateY(-12px)}}
+.sub{color:var(--ink-soft);font-size:1.05rem;margin:8px 0 18px}
+input{font:inherit;font-size:1.3rem;text-align:center;padding:12px 16px;border:3px solid var(--blue-d);border-radius:20px;width:100%;max-width:340px;background:var(--card);color:var(--ink);outline:none}
+input:focus-visible,button:focus-visible{outline:4px solid var(--yellow);outline-offset:2px}
+.btn{font:inherit;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:1.3rem;border:0;border-radius:999px;padding:12px 30px;margin-top:16px;
+  background:var(--pink-d);color:#fff;cursor:pointer;box-shadow:0 6px 0 #b8307a;transition:transform .1s}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b8307a}
+.btn.blue{background:var(--blue-d);box-shadow:0 6px 0 #2f7fb8}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;font-weight:600}
+.pill{background:var(--card);border:3px solid var(--blue-d);border-radius:999px;padding:4px 14px;font-size:1rem}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cat{background:var(--blue-d);color:#fff;border-radius:18px;padding:8px 4px;font-family:"Baloo 2",sans-serif;font-weight:800;
+  font-size:clamp(.72rem,2.9vw,1.15rem);line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:74px}
+.cat small{font-weight:500;font-size:.72em;opacity:.95}
+.cat .e{font-size:1.6em}
+.cell{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:clamp(1.1rem,4.6vw,2rem);color:var(--ink);
+  background:var(--yellow);border:3px solid #f5d94a;border-radius:18px;min-height:clamp(58px,13vw,92px);cursor:pointer;box-shadow:0 5px 0 #e7c52f;transition:transform .1s}
+.cell:nth-child(8n+6),.cell:nth-child(8n+7),.cell:nth-child(8n+8){background:var(--pink-l);border-color:var(--pink);box-shadow:0 5px 0 var(--pink)}
+.cell:active{transform:translateY(3px)}
+.cell:disabled{cursor:default;opacity:.45;transform:none;box-shadow:none;background:var(--lilac);border-color:var(--lilac);font-size:1.2em}
+.overlay{position:fixed;inset:0;background:rgba(74,49,80,.55);display:none;align-items:center;justify-content:center;padding:14px;z-index:20;
+  padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.overlay.on{display:flex}
+.qbox{background:var(--card);border:5px solid var(--pink);border-radius:30px;padding:20px 16px;width:100%;max-width:560px;max-height:100%;overflow:auto;text-align:center;box-shadow:0 8px 0 var(--pink-d);animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.qtag{display:inline-block;background:var(--blue);color:var(--ink);border-radius:999px;padding:2px 14px;font-weight:600;font-size:.95rem}
+.qemoji{font-size:3.2rem;margin:6px 0}
+.qde{font-size:clamp(1.3rem,5vw,1.8rem);font-weight:800;margin:4px 0}
+.qes{color:var(--ink-soft);font-size:1.05rem;margin-bottom:12px}
+.opts{display:grid;gap:10px}
+.opt{font:inherit;font-family:"Baloo 2",sans-serif;font-weight:700;font-size:1.3rem;padding:12px;border-radius:20px;border:3px solid var(--blue-d);background:var(--card);color:var(--ink);cursor:pointer;box-shadow:0 4px 0 var(--blue-d)}
+.opt:active{transform:translateY(3px)}
+.opt.good{background:var(--ok);border-color:#2f9e63;color:#103a24;box-shadow:0 4px 0 #2f9e63}
+.opt.bad{background:var(--no);border-color:#d04a63;color:#4a0c1a;box-shadow:0 4px 0 #d04a63}
+.fb{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:1.4rem;margin-top:12px;min-height:2.2em}
+.diploma{border:6px double var(--pink-d);background:var(--card);border-radius:24px;padding:22px 14px;position:relative}
+.diploma h2{font-size:clamp(1.6rem,6vw,2.4rem);color:var(--pink-d)}
+.name{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:clamp(2rem,9vw,3.4rem);color:var(--blue-d);word-break:break-word;border-bottom:4px dotted var(--pink);display:inline-block;max-width:100%;margin:6px 0}
+.stars{font-size:2.4rem;letter-spacing:4px;margin:6px 0}
+.score{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:2.6rem;color:#d98a00}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.fixed-top{position:absolute;top:6px;right:10px}
+.theme{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:10;border:0;background:var(--card);border-radius:50%;width:42px;height:42px;font-size:1.2rem;cursor:pointer;box-shadow:0 3px 0 var(--pink)}
+@media print{.btn,.theme{display:none}}
+@media (prefers-reduced-motion:reduce){.bunny{animation:none}.qbox{animation:none}}
+</style>
+</head>
+<body>
+<div class="top"></div>
+
+<section id="s-start" class="screen on">
+  <div class="card">
+    <div class="bunny">🐰</div>
+    <h1 class="logo"><span>Deutsch</span> <span>Jeopardy</span> <span>⭐</span></h1>
+    <p class="sub">Willkommen! · ¡Bienvenido! Vamos a jugar y aprender alemán 🇩🇪<br>Wie heißt du? · ¿Cómo te llamas?</p>
+    <input id="nm" maxlength="20" placeholder="Dein Name ✏️" autocomplete="off">
+    <br><button class="btn" id="go">Los geht’s! 🎈</button>
+  </div>
+</section>
+
+<section id="s-board" class="screen">
+  <div class="hud"><span class="pill" id="hi">🐰</span><span class="pill" id="sc">⭐ 0</span></div>
+  <div class="card" style="padding:12px 10px"><div class="board" id="board"></div></div>
+  <p class="sub">Tippe auf eine Karte! · ¡Toca una tarjeta! 👆</p>
+</section>
+
+<section id="s-end" class="screen">
+  <div class="card">
+    <h1 class="logo" style="font-size:clamp(1.6rem,7vw,2.6rem)">Herzlichen Glückwunsch!</h1>
+    <p class="sub" style="font-size:1.2rem">¡Felicidades, lo lograste! 🎉🎈⭐</p>
+    <div class="diploma">
+      <div style="font-size:2.4rem">🏅🐰🏅</div>
+      <h2>Diplom · Diploma</h2>
+      <p class="sub" style="margin:4px">Dieses Diplom bekommt · Este diploma es para</p>
+      <div class="name" id="dn"></div>
+      <div class="stars" id="dst"></div>
+      <div class="score" id="dsc"></div>
+      <p class="sub" id="dmsg"></p>
+      <p style="margin:4px;color:var(--ink-soft)">Tage und Monate 📅 · Das Wetter und die Jahreszeiten 🌦️</p>
+    </div>
+    <button class="btn" id="again">Nochmal spielen 🔁</button>
+    <button class="btn blue" id="print">Herunterladen · Descargar PDF 📥</button>
+    <img id="pv" alt="Diplom JPG" style="display:none;max-width:320px;width:100%;margin:16px auto 0;border-radius:16px;border:3px solid var(--pink)">
+  </div>
+</section>
+
+<div class="overlay" id="ov"><div class="qbox">
+  <span class="qtag" id="qt"></span>
+  <div class="qemoji" id="qe"></div>
+  <div class="qde" id="qd"></div>
+  <div class="qes" id="qs"></div>
+  <div class="opts" id="qo"></div>
+  <div class="fb" id="fb" aria-live="polite"></div>
+</div></div>
+
+<button class="theme" id="th" aria-label="Hell / Dunkel">🌙</button>
+<canvas id="fx"></canvas>
+
+<script>
+var CATS=[
+ {n:"Die Tage",s:"Los días",e:"📅",q:[
+  {e:"🌙",d:"Wie sagt man „Lunes“ auf Deutsch?",s:"¿Cómo se dice «lunes» en alemán?",o:["Montag","Dienstag","Mittwoch"],a:0},
+  {e:"➡️",d:"Welcher Tag kommt nach Mittwoch?",s:"¿Qué día viene después del miércoles?",o:["Dienstag","Donnerstag","Freitag"],a:1},
+  {e:"🎈",d:"Samstag und ___ sind das Wochenende.",s:"Sábado y ___ son el fin de semana.",o:["Freitag","Montag","Sonntag"],a:2},
+  {e:"🔢",d:"Wie viele Tage hat eine Woche?",s:"¿Cuántos días tiene una semana?",o:["fünf","sieben","zehn"],a:1}]},
+ {n:"Die Monate",s:"Los meses",e:"🗓️",q:[
+  {e:"🎆",d:"Wie sagt man „Enero“ auf Deutsch?",s:"¿Cómo se dice «enero» en alemán?",o:["Januar","Juni","Juli"],a:0},
+  {e:"🎄",d:"Welcher Monat ist „Diciembre“?",s:"¿Cuál mes es «diciembre»?",o:["November","September","Dezember"],a:2},
+  {e:"🏖️",d:"Was heißt „Julio“ auf Deutsch?",s:"¿Cómo se dice «julio» en alemán?",o:["Juni","Juli","August"],a:1},
+  {e:"🔢",d:"Wie viele Monate hat ein Jahr?",s:"¿Cuántos meses tiene un año?",o:["zehn","zwanzig","zwölf"],a:2}]},
+ {n:"Das Wetter",s:"El clima",e:"⛅",q:[
+  {e:"☀️",d:"Die Sonne scheint.",s:"¿Qué significa?",o:["Hace sol","Llueve","Nieva"],a:0},
+  {e:"🌧️",d:"Es regnet.",s:"¿Qué significa?",o:["Nieva","Llueve","Hace viento"],a:1},
+  {e:"💨",d:"Wie sagt man „Hace viento“?",s:"¿Cómo se dice en alemán?",o:["Es ist heiß","Es ist kalt","Es ist windig"],a:2},
+  {e:"🥶",d:"Es ist kalt.",s:"¿Qué significa?",o:["Hace calor","Hace frío","Está nublado"],a:1}]},
+ {n:"Die Jahres-zeiten",s:"Las estaciones",e:"🌸",q:[
+  {e:"🌷",d:"Wie sagt man „Primavera“?",s:"¿Cómo se dice en alemán?",o:["der Frühling","der Sommer","der Winter"],a:0},
+  {e:"⛄",d:"Der Winter = ?",s:"¿Qué estación es?",o:["el verano","el invierno","el otoño"],a:1},
+  {e:"🏖️",d:"Im Sommer ist es ___.",s:"En verano hace ___.",o:["kalt","nass","heiß"],a:2},
+  {e:"🍂",d:"Die Blätter fallen. Welche Jahreszeit?",s:"Las hojas caen. ¿Qué estación?",o:["der Frühling","der Herbst","der Sommer"],a:1}]}
+];
+var PTS=[100,200,300,400],MAX=4000,score=0,done=0,player="",busy=false;
+function $(i){return document.getElementById(i)}
+function show(id){["s-start","s-board","s-end"].forEach(function(s){$(s).classList.toggle("on",s===id)});window.scrollTo(0,0)}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+function build(){
+  var b=$("board");b.innerHTML="";score=0;done=0;$("sc").textContent="⭐ 0";
+  CATS.forEach(function(c){var d=document.createElement("div");d.className="cat";
+    d.innerHTML='<span class="e">'+c.e+'</span>'+c.n.replace("-","&shy;")+'<small>'+c.s+'</small>';b.appendChild(d)});
+  for(var r=0;r<4;r++)for(var c=0;c<4;c++){(function(r,c){
+    var k=document.createElement("button");k.className="cell";k.textContent=PTS[r];
+    k.onclick=function(){ask(r,c,k)};b.appendChild(k)})(r,c)}
+}
+function ask(r,c,cell){
+  var q=CATS[c].q[r];busy=false;
+  $("qt").textContent=CATS[c].n.replace("-","")+" · "+PTS[r]+" ⭐";
+  $("qe").textContent=q.e;$("qd").textContent=q.d;$("qs").textContent=q.s;$("fb").textContent="";
+  var box=$("qo");box.innerHTML="";
+  shuffle(q.o.map(function(t,i){return{t:t,ok:i===q.a}})).forEach(function(o){
+    var bt=document.createElement("button");bt.className="opt";bt.textContent=o.t;bt.dataset.ok=o.ok?"1":"0";
+    bt.onclick=function(){pick(bt,o.ok,r,cell)};box.appendChild(bt)});
+  $("ov").classList.add("on");
+}
+function pick(bt,ok,r,cell){
+  if(busy)return;busy=true;
+  var all=$("qo").children;
+  if(ok){bt.classList.add("good");score+=PTS[r];$("sc").textContent="⭐ "+score;$("fb").textContent="Super! Richtig! 🎉 ¡Muy bien!";mini()}
+  else{bt.classList.add("bad");$("fb").textContent="Fast! Probier wieder! 💪 ¡Casi! Sigue intentando";
+    for(var i=0;i<all.length;i++)if(all[i].dataset.ok==="1")all[i].classList.add("good")}
+  cell.disabled=true;cell.textContent=ok?"✔":"💭";done++;
+  setTimeout(function(){$("ov").classList.remove("on");if(done===16)finish()},ok?1300:1900);
+}
+function finish(){
+  var p=score/MAX,n=p>=.85?3:p>=.5?2:1;
+  $("dn").textContent=player;$("dst").textContent="⭐".repeat(n)+"☆".repeat(3-n);
+  $("dsc").textContent=score+" / "+MAX+" Punkte";
+  $("dmsg").textContent=n===3?"Fantastisch! · ¡Fantástico, eres una estrella!":n===2?"Sehr gut! · ¡Muy bien, sigue así!":"Gut gemacht! · ¡Buen trabajo, sigue practicando!";
+  show("s-end");celebrate();
+}
+$("go").onclick=function(){var v=$("nm").value.trim();if(!v){$("nm").focus();$("nm").placeholder="Bitte Namen schreiben! ✏️";return}
+  player=v;$("hi").textContent="🐰 "+v;build();show("s-board")};
+$("nm").onkeydown=function(e){if(e.key==="Enter")$("go").click()};
+$("again").onclick=function(){build();show("s-board")};
+var dl=null;
+function noDl(){$("print").style.display="none"}
+try{if(window.claude&&claude.use){claude.use("downloads").then(function(x){dl=x;if(!x)noDl()}).catch(noDl)}else noDl()}catch(e){noDl()}
+function drawDiploma(){
+  var W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;var g=c.getContext("2d");
+  var F="'Baloo 2','Fredoka','Trebuchet MS',sans-serif";
+  g.fillStyle="#d6edff";g.fillRect(0,0,W,H);
+  g.fillStyle="rgba(255,255,255,.6)";
+  for(var x=20;x<W;x+=44)for(var y=20;y<H;y+=44){g.beginPath();g.arc(x,y,3,0,7);g.fill()}
+  g.fillStyle="#ff8fc7";g.fillRect(0,0,W,70);
+  g.fillStyle="#fffafd";for(var k=0;k<=W;k+=56){g.beginPath();g.arc(k,70,28,0,Math.PI);g.fill()}
+  g.fillStyle="#fffafd";g.beginPath();g.roundRect(70,150,940,1130,50);g.fill();
+  g.lineWidth=10;g.strokeStyle="#ff8fc7";g.stroke();
+  g.lineWidth=4;g.strokeStyle="#e9529a";g.beginPath();g.roundRect(96,176,888,1078,36);g.stroke();
+  g.textAlign="center";g.textBaseline="alphabetic";
+  function t(txt,y,sz,col,w){g.font=(w||700)+" "+sz+"px "+F;g.fillStyle=col;g.fillText(txt,W/2,y)}
+  t("🏅🐰🏅",300,120,"#000");
+  t("Diplom · Diploma",430,92,"#e9529a",800);
+  t("Dieses Diplom bekommt",510,40,"#7a6480",500);
+  t("Este diploma es para",560,40,"#7a6480",500);
+  var nm=$("dn").textContent,sz=140;
+  g.font="800 "+sz+"px "+F;while(g.measureText(nm).width>800&&sz>40){sz-=6;g.font="800 "+sz+"px "+F}
+  t(nm,710,sz,"#4aa8e8",800);
+  g.setLineDash([4,16]);g.lineWidth=8;g.lineCap="round";g.strokeStyle="#ff8fc7";g.beginPath();g.moveTo(160,745);g.lineTo(920,745);g.stroke();g.setLineDash([]);
+  t($("dst").textContent,880,110,"#f0b800");
+  t($("dsc").textContent,1000,96,"#d98a00",800);
+  var m=$("dmsg").textContent.split(" · ");
+  t(m[0],1085,46,"#4a3150",700);if(m[1])t(m[1],1140,42,"#7a6480",500);
+  t("Tage und Monate · Das Wetter und die Jahreszeiten",1205,30,"#7a6480",500);
+  g.font="70px "+F;g.fillText("⭐",150,250);g.fillText("⭐",930,250);g.fillText("🎈",150,1220);g.fillText("🎈",930,1220);
+  return c;
+}
+function makePdf(jpg){
+  var parts=[],len=0,offs=[];
+  function add(x){if(typeof x==="string"){var a=new Uint8Array(x.length);for(var i=0;i<x.length;i++)a[i]=x.charCodeAt(i)&255;x=a}parts.push(x);len+=x.length}
+  function obj(n,b){offs[n]=len;add(n+" 0 obj\n"+b+"\nendobj\n")}
+  add("%PDF-1.4\n");
+  obj(1,"<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2,"<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+  obj(3,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 540 675] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>");
+  offs[4]=len;add("4 0 obj\n<< /Type /XObject /Subtype /Image /Width 1080 /Height 1350 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+jpg.length+" >>\nstream\n");add(jpg);add("\nendstream\nendobj\n");
+  var c="q 540 0 0 675 0 0 cm /Im0 Do Q";
+  obj(5,"<< /Length "+c.length+" >>\nstream\n"+c+"\nendstream");
+  var xr=len,x="xref\n0 6\n0000000000 65535 f \n";
+  for(var n=1;n<=5;n++)x+=("0000000000"+offs[n]).slice(-10)+" 00000 n \n";
+  add(x+"trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF");
+  var out=new Uint8Array(len),p=0;parts.forEach(function(a){out.set(a,p);p+=a.length});
+  return out;
+}
+$("print").onclick=function(){
+  if(!dl)return;
+  var p=document.fonts&&document.fonts.load?document.fonts.load("800 60px 'Baloo 2'"):Promise.resolve();
+  Promise.resolve(p).catch(function(){}).then(function(){
+    var cv2=drawDiploma(),url=cv2.toDataURL("image/jpeg",.92);
+    var pv=$("pv");pv.src=url;pv.style.display="block";
+    var bin=atob(url.split(",")[1]),u8=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+    var base=player.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"alumno";
+    var fn="diploma-"+base+".pdf";
+    dl.save({filename:fn,data:makePdf(u8).buffer}).catch(function(){});
+  });
+};
+
+/* theme */
+$("th").onclick=function(){var r=document.documentElement,dk=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme:dark)").matches);
+  r.setAttribute("data-theme",dk?"light":"dark");$("th").textContent=dk?"🌙":"☀️"};
+
+/* confetti, stars, balloons */
+var cv=$("fx"),cx=cv.getContext("2d"),parts=[],raf=null,COL=["#ff8fc7","#bfe3ff","#fff3a8","#c8f0a8","#d9c8ff","#ff7a8f","#4aa8e8"];
+function size(){var d=window.devicePixelRatio||1;cv.width=innerWidth*d;cv.height=innerHeight*d;cx.setTransform(d,0,0,d,0,0)}
+addEventListener("resize",size);size();
+function R(a,b){return a+Math.random()*(b-a)}
+function mk(kind){var W=innerWidth,H=innerHeight;
+  if(kind==="balloon")return{k:"b",x:R(0,W),y:H+R(20,300),vy:-R(1.2,2.6),vx:R(-.3,.3),s:R(22,38),c:COL[Math.floor(R(0,COL.length))],ph:R(0,6)};
+  if(kind==="star")return{k:"s",x:R(0,W),y:-R(10,300),vy:R(1.5,3),vx:R(-.5,.5),s:R(10,20),r:R(0,6),vr:R(-.05,.05)};
+  return{k:"c",x:R(0,W),y:-R(10,400),vy:R(2,5),vx:R(-1,1),w:R(6,11),h:R(4,8),r:R(0,6),vr:R(-.2,.2),c:COL[Math.floor(R(0,COL.length))]}}
+function star(x,y,s,r){cx.save();cx.translate(x,y);cx.rotate(r);cx.beginPath();for(var i=0;i<10;i++){var a=i*Math.PI/5,l=i%2?s*.45:s;cx.lineTo(Math.sin(a)*l,-Math.cos(a)*l)}cx.closePath();cx.fillStyle="#ffd93b";cx.fill();cx.strokeStyle="#f0b800";cx.lineWidth=2;cx.stroke();cx.restore()}
+function loop(){cx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;
+    if(p.k==="c"){p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()}
+    else if(p.k==="s"){p.r+=p.vr;star(p.x,p.y,p.s,p.r)}
+    else{p.ph+=.05;p.x+=Math.sin(p.ph)*.6;cx.strokeStyle="rgba(120,90,130,.6)";cx.lineWidth=1.5;cx.beginPath();cx.moveTo(p.x,p.y+p.s*1.25);cx.quadraticCurveTo(p.x+8,p.y+p.s*2,p.x,p.y+p.s*2.6);cx.stroke();
+      cx.fillStyle=p.c;cx.beginPath();cx.ellipse(p.x,p.y,p.s*.8,p.s,0,0,7);cx.fill();cx.fillStyle="rgba(255,255,255,.55)";cx.beginPath();cx.ellipse(p.x-p.s*.3,p.y-p.s*.35,p.s*.15,p.s*.28,0,0,7);cx.fill()}});
+  parts=parts.filter(function(p){return p.y<innerHeight+60&&p.y>-500});
+  if(parts.length)raf=requestAnimationFrame(loop);else{raf=null;cx.clearRect(0,0,innerWidth,innerHeight)}}
+function burst(c,s,b){var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;if(reduce){c=Math.ceil(c/4);s=Math.ceil(s/4);b=Math.ceil(b/4)}
+  for(var i=0;i<c;i++)parts.push(mk("c"));for(i=0;i<s;i++)parts.push(mk("star"));for(i=0;i<b;i++)parts.push(mk("balloon"));
+  if(!raf)raf=requestAnimationFrame(loop)}
+function celebrate(){burst(140,25,14);setTimeout(function(){burst(90,15,8)},1800)}
+function mini(){burst(30,6,0)}
+</script>
+</body>
+</html>
